@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", sans-serif;
+
+  --color-brand-offwhite: #f9f9f9;
+  --color-offwhite: #f9f9f9;
+  --color-brand-orange: #ff8c00;
+  --color-orange: #f97316;
+  --color-brand-gold: #d4af37;
+  --color-gold: #fbbf24;
+  
+  --animate-shine: shine 1.5s ease-in-out infinite;
+  --animate-float: float 3s ease-in-out infinite;
+  
+  @keyframes shine {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(-50%) scale(1); }
+    50% { transform: translateY(-60%) scale(1.05); }
+  }
+  
+  @keyframes coinFlip {
+    from { transform: perspective(600px) rotateY(0deg); }
+    to { transform: perspective(600px) rotateY(360deg); }
+  }
+  
+  --z-ultra: 2147483647;
+}
+
+body {
+  @apply font-sans bg-brand-offwhite text-[#474704];
+  margin: 0;
+  padding: 0;
+}
+
+/* Ensure body scroll lock works */
+body.overflow-hidden {
+  overflow: hidden !important;
+}

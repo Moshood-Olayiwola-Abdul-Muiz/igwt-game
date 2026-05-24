@@ -1,0 +1,428 @@
+<div 
+  class="fixed inset-0 flex items-center justify-center p-4 sm:p-8 overflow-hidden z-[2147483647]"
+  [style.pointerEvents]="view() === 'idle' ? 'none' : 'auto'"
+>
+  
+  <!-- Backdrop -->
+  <div 
+    class="absolute inset-0 transition-all duration-700 bg-slate-900/80 backdrop-blur-sm"
+    [class.igwt-premium-bg]="view() !== 'intro' && view() !== 'idle'"
+    [style.opacity]="view() !== 'idle' ? '1' : '0'"
+    [style.pointerEvents]="view() !== 'idle' ? 'auto' : 'none'"
+  ></div>
+
+  <!-- Main Modal Container -->
+    <div 
+      #modal
+      class="relative z-20 w-auto min-w-[320px] transition-all duration-500 flex flex-col pointer-events-auto bg-[#f9f9f9] shadow-[0_35px_60px_-15px_rgba(212,175,55,0.4)]"
+      [class.invisible]="view() === 'idle'"
+      [class.max-w-[100vw]]="view() === 'playing'"
+      [class.max-w-[95vw]]="view() !== 'playing'"
+      [class.rounded-none]="view() === 'playing'"
+      [class.border-none]="view() === 'playing'"
+      [class.overflow-hidden]="view() !== 'playing'"
+      [class.metallic-border]="view() !== 'playing'"
+      [class.rounded-3xl]="view() !== 'playing'"
+      [style.width]="view() === 'intro' ? 'auto' : '100%'"
+      [style.maxWidth]="view() === 'playing' ? '100vw' : (view() === 'intro' ? '28rem' : '72rem')"
+      [style.height]="view() === 'intro' ? 'auto' : (view() === 'playing' ? '100vh' : '88vh')"
+      [style.maxHeight]="view() === 'playing' ? '100vh' : '92vh'"
+    >
+    
+    <!-- Top Bar -->
+    <div class="flex items-center justify-between px-8 py-4 border-b border-gold bg-white h-14 min-h-[56px]">
+      <div class="flex items-center gap-4">
+        <button (click)="view.set('showcase')" class="flex items-center gap-2 bg-[#fdfaf1] px-4 py-1.5 rounded-full border border-gold/40 shadow-sm transition-all hover:bg-gold/10 cursor-pointer">
+          <span class="material-icons text-gold text-[20px] animate-gold-spin">monetization_on</span>
+          <span class="text-slate-800 font-bold text-sm tracking-tight">{{ totalCoins() }}</span>
+        </button>
+        <button (click)="view.set('showcase')" class="flex items-center gap-2 bg-[#fff7ed] px-4 py-1.5 rounded-full border border-orange/40 shadow-sm transition-all hover:bg-orange/10 cursor-pointer">
+          <span class="material-icons text-orange text-[20px]">diamond</span>
+          <span class="text-slate-800 font-bold text-sm tracking-tight">{{ igwt.state().gems }}</span>
+        </button>
+      </div>
+      
+      <div class="text-center absolute left-1/2 -translate-x-1/2 hidden md:block opacity-30">
+        <span class="text-[10px] uppercase tracking-widest font-bold text-slate-800">The IGWT Engine</span>
+      </div>
+
+      <button (click)="minimizeToEdge()" class="p-4 hover:text-orange transition-colors cursor-pointer outline-none border-none bg-transparent">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <!-- Content Area -->
+    <div class="flex-1 custom-scrollbar" 
+         [ngClass]="view() === 'playing' ? 'overflow-hidden p-0 bg-slate-900' : 'overflow-y-auto p-4 sm:p-8 bg-offwhite'"
+         style="-webkit-overflow-scrolling: touch; overscroll-behavior-y: contain;">
+      
+      <!-- VIEW: INTRO -->
+      @if (view() === 'intro') {
+        <div class="flex flex-col items-center text-center max-w-lg mx-auto py-12">
+          <h2 class="text-xs font-bold tracking-[0.3em] text-gold uppercase mb-4">THE IGWT ENGINE</h2>
+          <h1 class="text-4xl sm:text-5xl font-display font-bold text-slate-800 leading-none mb-6">
+            PROVE YOUR SKILL.<br>
+            <span class="text-orange">EARN YOUR DISCOUNT.</span>
+          </h1>
+          <p class="text-slate-500 font-medium leading-relaxed mb-10">
+            You have 3 attempts to prove yourself. <br>
+            Play games. Earn coins. Unlock rewards.
+          </p>
+          
+          <button 
+            type="button"
+            (click)="enterTheForge()"
+            class="btn-primary px-12 py-5 rounded-2xl text-lg shadow-2xl animate-breathe uppercase tracking-widest font-bold cursor-pointer relative z-30"
+          >
+            <span class="material-icons mr-2">bolt</span>
+            ENTER THE FORGE
+          </button>
+        </div>
+      }
+
+      <!-- VIEW: ARCADE HUB (QUADRANT LAYOUT) -->
+      @if (view() === 'arcade') {
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pb-8">
+          
+          <div (click)="selectGame('runner')" (keydown.enter)="selectGame('runner')" tabindex="0" role="button" class="arcade-card">
+            <div class="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center text-orange shadow-lg">
+              <span class="material-icons">alt_route</span>
+            </div>
+            <div>
+              <h3 class="font-display font-bold text-xl text-slate-800">Temple Escape</h3>
+              <p class="text-xs text-slate-500 mt-2 leading-relaxed">Endless Runner. Dodge obstacles.</p>
+            </div>
+            <div class="absolute top-4 right-4 text-xs font-bold text-gold tracking-widest uppercase">Runner</div>
+          </div>
+
+          <div (click)="selectGame('racer')" (keydown.enter)="selectGame('racer')" tabindex="0" role="button" class="arcade-card">
+            <div class="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center text-orange shadow-lg">
+              <span class="material-icons">speed</span>
+            </div>
+            <div>
+              <h3 class="font-display font-bold text-xl text-slate-800">Car Essence</h3>
+              <p class="text-xs text-slate-500 mt-2 leading-relaxed">Action Pursuit. Dodge incoming traffic.</p>
+            </div>
+            <div class="absolute top-4 right-4 text-xs font-bold text-gold tracking-widest uppercase">Racer</div>
+          </div>
+
+          <div (click)="selectGame('rhythm')" (keydown.enter)="selectGame('rhythm')" tabindex="0" role="button" class="arcade-card">
+            <div class="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center text-orange shadow-lg">
+              <span class="material-icons">extension</span>
+            </div>
+            <div>
+              <h3 class="font-display font-bold text-xl text-slate-800">Candy Puzzle</h3>
+              <p class="text-xs text-slate-500 mt-2 leading-relaxed">Match tokens to win discounts.</p>
+            </div>
+            <div class="absolute top-4 right-4 text-xs font-bold text-gold tracking-widest uppercase">Puzzle</div>
+          </div>
+
+          <div (click)="selectGame('shooter')" (keydown.enter)="selectGame('shooter')" tabindex="0" role="button" class="arcade-card">
+            <div class="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center text-orange shadow-lg">
+              <span class="material-icons">track_changes</span>
+            </div>
+            <div>
+              <h3 class="font-display font-bold text-xl text-slate-800">Bean Defender</h3>
+              <p class="text-xs text-slate-500 mt-2 leading-relaxed">Platformer action. Shoot down enemies.</p>
+            </div>
+            <div class="absolute top-4 right-4 text-xs font-bold text-gold tracking-widest uppercase">Shooter</div>
+          </div>
+
+          <!-- Friday Special -->
+          @if (igwt.state().isFriday) {
+            <div (click)="selectGame('rhythm')" (keydown.enter)="selectGame('rhythm')" tabindex="0" role="button" class="sm:col-span-2 bg-gradient-to-r from-orange to-gold p-1 rounded-3xl shadow-xl hover:scale-[1.01] transition-transform">
+               <div class="bg-white rounded-[1.4rem] p-8 flex items-center justify-between">
+                  <div class="flex items-center gap-6">
+                    <div class="w-16 h-16 bg-orange rounded-full flex items-center justify-center text-white shadow-xl animate-pulse">
+                      <span class="material-icons text-3xl">celebration</span>
+                    </div>
+                    <div>
+                      <h3 class="font-display font-bold text-2xl text-orange">FRIDAY SPIN TO WIN</h3>
+                      <p class="text-sm text-slate-400 mt-1 uppercase tracking-widest font-bold">Double coins or risk for Gems</p>
+                    </div>
+                  </div>
+                  <span class="material-icons text-gold text-4xl">keyboard_double_arrow_right</span>
+               </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- VIEW: PLAYING -->
+      @if (view() === 'playing') {
+        <div class="h-full flex flex-col">
+          <div class="flex justify-between items-center bg-white px-6 py-4 border-b border-gold/30">
+            <div class="flex items-center gap-8">
+              <div class="flex flex-col">
+                <span class="text-[10px] uppercase tracking-widest text-slate-400 font-bold leading-none">SCORE</span>
+                <span class="text-2xl font-display font-bold text-slate-800 tabular-nums">{{ score() | number:'4.0-0' }}</span>
+              </div>
+              <div class="h-10 w-px bg-gold/20"></div>
+              <div class="flex flex-col">
+                <span class="text-[10px] uppercase tracking-widest text-slate-400 font-bold leading-none">TIME</span>
+                <span class="text-2xl font-display font-bold text-orange tabular-nums">{{ timer() | number:'1.1-1' }}s</span>
+              </div>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mr-2">LIVES</span>
+              @for (s of [1,2,3]; track s) {
+                <div 
+                  class="w-6 h-6 flex items-center justify-center transition-transform"
+                  [style.transform]="(3 - strikes()) >= s ? 'scale(1.1)' : 'scale(0.8)'"
+                >
+                  <span class="material-icons" [class.text-red-500]="(3 - strikes()) >= s" [class.text-slate-300]="(3 - strikes()) < s">
+                    {{ (3 - strikes()) >= s ? 'favorite' : 'favorite_border' }}
+                  </span>
+                </div>
+              }
+            </div>
+          </div>
+          
+          <div class="relative flex-1 min-h-0 min-w-0 bg-offwhite igwt-premium-bg flex items-center justify-center overflow-hidden">
+            <canvas 
+              #gameCanvas 
+              (mousemove)="onMouseMove($event)"
+              (touchmove)="onTouchMove($event)"
+              (mousedown)="onMouseDown($event)"
+              (touchstart)="onTouchStart($event)"
+              (mouseup)="onMouseUp()"
+              (touchend)="onTouchEnd($event)"
+              (mouseleave)="onMouseUp()"
+              (click)="handleCanvasClick($event)"
+              width="1200" 
+              height="800" 
+              class="w-full h-full cursor-crosshair z-10 touch-none shadow-2xl rounded-lg border-2 border-gold/20"
+              style="object-fit: contain; max-height: 100%; max-width: 100%;"
+            ></canvas>
+            
+            <!-- Dynamic Instruction Overlay -->
+            <div class="absolute top-12 left-1/2 -translate-x-1/2 pointer-events-none text-center z-20">
+               <p class="text-slate-500 text-[10px] font-bold tracking-ultra uppercase mb-2">Eliminate Golden Units / Avoid Red Traps</p>
+               <h3 class="text-gold font-display font-bold text-3xl uppercase tracking-tighter">{{ currentGame()?.replace('_', ' ') }} PROTOCOL</h3>
+            </div>
+            
+            <!-- Mobile Controls Overlay for Shooter and Racer -->
+            @if (currentGame() === 'shooter' || currentGame() === 'racer') {
+              <div class="md:hidden absolute bottom-10 left-0 right-0 px-4 md:px-8 z-30 flex justify-between pointer-events-none touch-none select-none">
+                 <!-- Directional -->
+                 <div class="flex gap-4 opacity-70">
+                    <button 
+                      class="w-16 h-16 rounded-full bg-slate-900/50 backdrop-blur border-2 border-white/20 text-white flex items-center justify-center pointer-events-auto active:scale-95 active:bg-slate-900 transition-all select-none"
+                      (touchstart)="keys['ArrowLeft'] = true; $event.preventDefault()"
+                      (touchend)="keys['ArrowLeft'] = false; $event.preventDefault()"
+                      (mousedown)="keys['ArrowLeft'] = true"
+                      (mouseup)="keys['ArrowLeft'] = false"
+                      (mouseleave)="keys['ArrowLeft'] = false"
+                    ><span class="material-icons text-3xl pointer-events-none">arrow_back</span></button>
+                    
+                    <button 
+                      class="w-16 h-16 rounded-full bg-slate-900/50 backdrop-blur border-2 border-white/20 text-white flex items-center justify-center pointer-events-auto active:scale-95 active:bg-slate-900 transition-all select-none"
+                      (touchstart)="keys['ArrowRight'] = true; $event.preventDefault()"
+                      (touchend)="keys['ArrowRight'] = false; $event.preventDefault()"
+                      (mousedown)="keys['ArrowRight'] = true"
+                      (mouseup)="keys['ArrowRight'] = false"
+                      (mouseleave)="keys['ArrowRight'] = false"
+                    ><span class="material-icons text-3xl pointer-events-none">arrow_forward</span></button>
+                 </div>
+                 
+                 <!-- Action (Jump/Shoot) -->
+                 <div class="flex gap-4 opacity-70">
+                    @if (currentGame() === 'shooter') {
+                    <button 
+                      class="w-16 h-16 rounded-full bg-red-500/50 backdrop-blur border-2 border-red-500 text-white flex items-center justify-center pointer-events-auto active:scale-95 active:bg-red-500 transition-all select-none shadow-[0_0_15px_rgba(239,68,68,0.5)]"
+                      (touchstart)="keys['Shoot'] = true; $event.preventDefault()"
+                      (touchend)="keys['Shoot'] = false; $event.preventDefault()"
+                      (mousedown)="keys['Shoot'] = true"
+                      (mouseup)="keys['Shoot'] = false"
+                      (mouseleave)="keys['Shoot'] = false"
+                    ><span class="material-icons text-3xl pointer-events-none">my_location</span></button>
+                    }
+
+                    <button 
+                      class="w-16 h-16 rounded-full bg-orange/50 backdrop-blur border-2 border-orange text-white flex items-center justify-center pointer-events-auto active:scale-95 active:bg-orange transition-all select-none shadow-[0_0_15px_rgba(234,88,12,0.5)]"
+                      (touchstart)="keys['ArrowUp'] = true; keys[' '] = true; $event.preventDefault()"
+                      (touchend)="keys['ArrowUp'] = false; keys[' '] = false; $event.preventDefault()"
+                      (mousedown)="keys['ArrowUp'] = true; keys[' '] = true"
+                      (mouseup)="keys['ArrowUp'] = false; keys[' '] = false"
+                      (mouseleave)="keys['ArrowUp'] = false; keys[' '] = false"
+                    ><span class="material-icons text-3xl pointer-events-none">rocket_launch</span></button>
+                 </div>
+              </div>
+            }
+
+          </div>
+        </div>
+      }
+
+      <!-- VIEW: POSTGAME -->
+      @if (view() === 'postgame') {
+        <div class="flex flex-col items-center justify-center text-center max-w-lg mx-auto py-12">
+          <h2 class="text-xs font-bold tracking-ultra text-gold uppercase mb-4">MATCH COMPLETE</h2>
+          <h1 class="text-4xl sm:text-5xl font-display font-bold text-slate-800 leading-none mb-6">
+            YOU EARNED <span class="text-orange">{{ coinsEarnedThisGame() }}</span> COINS!
+          </h1>
+          @if (gemsEarned() > 0) {
+            <p class="text-gold font-bold text-xl mb-4">+{{ gemsEarned() }} Gems unlocked!</p>
+          }
+          
+          <div class="flex flex-col gap-4 mt-8 w-full max-w-sm">
+            @if (igwt.state().attemptsToday < 3) {
+              <button 
+                (click)="enterTheForge()"
+                class="btn-primary px-8 py-4 rounded-2xl text-lg shadow-xl font-bold w-full"
+              >
+                PLAY AGAIN (Trials left: {{ 3 - igwt.state().attemptsToday }})
+              </button>
+              <button 
+                (click)="goToShowcase()"
+                class="bg-slate-200 text-slate-800 hover:bg-slate-300 px-8 py-4 rounded-2xl text-lg shadow-sm font-bold w-full transition-colors"
+              >
+                SPEND COINS NOW
+              </button>
+            } @else {
+              <button 
+                (click)="goToShowcase()"
+                class="btn-primary px-8 py-4 rounded-2xl text-lg shadow-xl font-bold w-full animate-breathe"
+              >
+                PROCEED TO SHOWCASE
+              </button>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- VIEW: SHOWCASE (THE SHOWCASE OF WEALTH) -->
+      @if (view() === 'showcase') {
+        <div class="flex flex-col w-full bg-slate-50 relative z-30 pointer-events-auto">
+          <!-- Hero Section -->
+          <div class="relative bg-slate-900 text-white shrink-0 shadow-lg pb-10 pt-10 sm:pt-14 px-8 text-center rounded-b-[2.5rem]">
+            <!-- Background effects -->
+            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gold/20 via-slate-900 to-slate-900 rounded-b-[2.5rem]"></div>
+            
+            <div class="relative z-10">
+              <h2 class="text-[10px] font-bold tracking-widest uppercase text-gold mb-3 flex items-center justify-center gap-2">
+                <span class="material-icons text-sm">stars</span>
+                CHOOSE A PRODUCT ON DISCOUNT
+                <span class="material-icons text-sm">stars</span>
+              </h2>
+              
+              <div class="flex flex-wrap items-center justify-center gap-4 mt-6">
+                 <div class="flex items-center gap-2 bg-white/10 backdrop-blur-md px-5 py-2.5 rounded-2xl border border-white/20 shadow-xl">
+                   <span class="material-icons text-gold animate-[coinFlip_4s_linear_infinite]">monetization_on</span>
+                   <div class="flex flex-col text-left">
+                     <span class="text-[10px] uppercase tracking-widest text-slate-400 font-bold leading-none">Coins Earned</span>
+                     <span class="text-white font-bold leading-none mt-1">{{ totalCoins() | number }}</span>
+                   </div>
+                 </div>
+                 <div class="flex items-center gap-2 bg-white/10 backdrop-blur-md px-5 py-2.5 rounded-2xl border border-white/20 shadow-xl">
+                   <span class="material-icons text-orange">electric_bolt</span>
+                   <div class="flex flex-col text-left">
+                     <span class="text-[9px] uppercase tracking-widest text-slate-400 font-bold leading-none">Discount Status</span>
+                     <span class="text-gold font-bold leading-none mt-1 text-xs">LOCKED IN</span>
+                   </div>
+                 </div>
+              </div>
+            </div>
+            
+            <!-- Bottom decorative edge -->
+          </div>
+
+          <!-- Body / Scrollable Product List -->
+          <div class="px-4 sm:px-8 py-8 bg-slate-50 relative pointer-events-auto">
+            
+            <div class="max-w-4xl mx-auto flex flex-col gap-4">
+              @for (p of igwt.products(); track p.id) {
+                <div class="bg-white rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center gap-5 border border-slate-200 shadow-sm hover:shadow-lg hover:border-gold/40 transition-all duration-300 group relative overflow-hidden pointer-events-auto">
+                  
+                  <!-- Hover subtle gradient -->
+                  <div class="absolute inset-0 bg-gradient-to-r from-transparent via-gold/0 to-gold/5 group-hover:via-gold/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-700 ease-out pointer-events-none"></div>
+
+                  <!-- Image -->
+                  <div class="w-24 h-24 sm:w-28 sm:h-28 shrink-0 bg-slate-50 rounded-xl flex items-center justify-center border border-slate-100 overflow-hidden shadow-inner relative z-10">
+                    @if (p.imageUrl && (p.imageUrl.includes('http') || p.imageUrl.includes('//'))) {
+                      <img [src]="p.imageUrl" [alt]="p.title" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" referrerpolicy="no-referrer">
+                    } @else {
+                      <span class="material-icons text-slate-300 text-4xl group-hover:text-gold/50 transition-colors">{{ p.imageUrl }}</span>
+                    }
+                  </div>
+
+                  <!-- Details -->
+                  <div class="flex-1 text-center sm:text-left relative z-10">
+                    <div class="flex items-center justify-center sm:justify-start gap-2 mb-1.5">
+                       <span class="text-[9px] font-bold uppercase tracking-widest text-slate-400">{{ p.collection }}</span>
+                       <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+                       <span class="text-[9px] font-bold uppercase tracking-widest text-emerald-500">In Stock</span>
+                    </div>
+                    <h3 class="text-lg font-display font-bold text-slate-800 tracking-tight mb-1 group-hover:text-gold transition-colors">{{ p.title }}</h3>
+                    
+                    <div class="flex items-end justify-center sm:justify-start gap-3 mt-3">
+                      <span class="text-xs font-medium text-slate-400 line-through decoration-slate-300">{{ p.price | currency }}</span>
+                      <span class="text-xl font-black text-orange drop-shadow-sm">{{ p.price * (1 - calculateDiscount()) | currency }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Action -->
+                  <div class="w-full sm:w-auto mt-2 sm:mt-0 relative z-10">
+                    <button class="w-full sm:w-auto bg-slate-900 hover:bg-gold text-white px-6 py-3.5 rounded-xl font-bold uppercase tracking-widest text-xs shadow-md transition-all active:scale-95 flex items-center justify-center gap-2 group/btn cursor-pointer" (click)="claimReward(p.variantId)">
+                      <span>CHECKOUT</span>
+                      <span class="material-icons text-sm group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
+                    </button>
+                  </div>
+                  
+                </div>
+              }
+            </div>
+
+            <div class="text-center mt-10 pb-6 pt-4">
+                <button (click)="enterTheForge()" class="inline-flex items-center gap-2 text-slate-400 hover:text-slate-600 transition-colors text-[10px] font-bold tracking-widest uppercase cursor-pointer bg-transparent border-none">
+                  <span class="material-icons text-[14px]">replay</span>
+                  Back to the Forge
+                </button>
+            </div>
+            
+          </div>
+        </div>
+      }
+
+    </div>
+
+  </div>
+
+  <!-- Simulated Checkout Overlay -->
+  @if (simulatingCheckoutUrl()) {
+    <div class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/90 pointer-events-auto">
+      <div class="bg-white p-8 rounded-3xl max-w-md text-center shadow-2xl metallic-border mx-4 animate-breathe">
+        <span class="material-icons text-gold text-6xl mb-4">shopping_cart_checkout</span>
+        <h3 class="font-display font-bold text-2xl text-slate-800 uppercase tracking-tight mb-2">Simulated Checkout</h3>
+        <p class="text-sm text-slate-500 mb-6">Seamless AJAX pipeline executed:</p>
+        <div class="bg-slate-100 p-4 rounded-xl text-xs font-mono text-slate-800 break-all border border-slate-200 text-left leading-relaxed">
+           <span class="text-slate-400">1.</span> POST /cart/clear.js<br>
+           <span class="text-slate-400">2.</span> POST /cart/add.js (Variant)<br>
+           <span class="text-slate-400">3.</span> Redirect &rarr; <strong>{{ simulatingCheckoutUrl() }}</strong>
+        </div>
+        <p class="text-xs text-orange font-bold uppercase tracking-widest mt-6">Discount code applied securely</p>
+      </div>
+    </div>
+  }
+
+</div>
+
+<!-- Floating Token Launcher (Minimized State) - Extracted out of pointer-events: none container -->
+@if (view() === 'idle') {
+  <button 
+    #token
+    id="persistent-token"
+    (click)="restoreFromEdge()"
+    (keydown.enter)="restoreFromEdge()"
+    class="fixed inset-0 w-full h-full flex items-center justify-center z-[2147483647] cursor-pointer pointer-events-auto outline-none border-none bg-transparent hover:scale-110 active:scale-90 transition-all duration-300"
+    aria-label="Open IGWT Deals"
+  >
+    <div 
+      class="w-[54px] h-[54px] rounded-full border-2 border-white shadow-[0_8px_24px_rgba(251,191,36,0.5),_inset_0_-4px_8px_rgba(0,0,0,0.25),_inset_0_4px_8px_rgba(255,255,255,0.4)] flex items-center justify-center overflow-hidden animate-bounce"
+      style="background: radial-gradient(circle at 35% 35%, #ffe066 0%, #f59e0b 45%, #b45309 90%);"
+    >
+      <span class="text-white font-display font-black text-2xl select-none drop-shadow-[0_2px_3px_rgba(0,0,0,0.4)]">$</span>
+    </div>
+  </button>
+}

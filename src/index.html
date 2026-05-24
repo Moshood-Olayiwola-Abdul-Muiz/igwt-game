@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>IGWT Arcade</title>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <script>
+      let storeProducts = [];
+      try {
+        const liquidData = `[
+          {% for product in collections.all.products limit: 4 %}
+          { 
+            "title": "{{ product.title }}", 
+            "desc": "{{ product.description | escape | strip_html | truncate: 80 }}", 
+            "price": {{ product.price | money_without_currency | default: 0 }}, 
+            "checkoutLink": "/cart/add?id={{ product.variants.first.id }}&quantity=1" 
+          },
+          {% endfor %}
+        ]`;
+        
+        // Very basic clean up for testing without Liquid
+        let clean = liquidData.replace(/{%[\s\S]*?%}/g, '');
+        if (clean.trim() === '[,]') clean = '[]';
+        storeProducts = JSON.parse(clean);
+      } catch(e) {}
+      
+      if (!storeProducts || storeProducts.length === 0 || (storeProducts[0] && storeProducts[0].title && storeProducts[0].title.includes('{{'))) { 
+        storeProducts = [ 
+          {title: "Automated Integration Suite", desc: "High-performance workflow.", price: 189.00, checkoutLink: "#"}, 
+          {title: "Conversion Accelerator", desc: "Boost your store.", price: 49.00, checkoutLink: "#"}   
+        ]; 
+      }
+      window.igwtStoreProducts = storeProducts;
+    </script>
+  </head>
+  <body>
+    <app-root></app-root>
+  </body>
+</html>

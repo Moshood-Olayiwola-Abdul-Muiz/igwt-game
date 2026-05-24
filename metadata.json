@@ -1,0 +1,8 @@
+{
+  "name": "Gold Token E-commerce Funnel",
+  "description": "A high-performance gamified e-commerce framework with physics-based animations and zero layout disruption.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
